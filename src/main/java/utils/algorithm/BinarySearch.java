@@ -1,29 +1,36 @@
 package utils.algorithm;
 
+import java.util.Comparator;
 import java.util.List;
 
-import static utils.postcode.PostcodeComparer.comparePostcodes;
-
 public class BinarySearch {
-    // Binary search to find the row with the given post code
-    public static String[] search(List<String[]> records, String searchPostCode) {
-        int left = 1;  // Start from index 1 to skip header
-        int right = records.size() - 1;  // Last index in the list
+    private final Comparator<String> postcodeComparator;
+
+    // Constructor Injection
+    public BinarySearch(Comparator<String> postcodeComparator) {
+        this.postcodeComparator = postcodeComparator;
+    }
+
+    public String[] search(List<String[]> records, String searchPostCode) {
+        int left = 1; // Skip header
+        int right = records.size() - 1;
 
         while (left <= right) {
             int mid = left + (right - left) / 2;
             String[] midRecord = records.get(mid);
-            String midPostCode = midRecord[1]; // Assuming post code is the first field
+            String midPostCode = midRecord[1]; // Assuming postcode is in column 1
 
-            if (midPostCode.equals(searchPostCode)) {
-                return midRecord;  // Found the matching post code
-            } else if (comparePostcodes(midPostCode, searchPostCode) < 0) {
-                left = mid + 1;  // Move to the right half
+            int comparison = postcodeComparator.compare(midPostCode, searchPostCode);
+
+            if (comparison == 0) {
+                return midRecord; // Found postcode
+            } else if (comparison < 0) {
+                left = mid + 1;
             } else {
-                right = mid - 1;  // Move to the left half
+                right = mid - 1;
             }
         }
 
-        return null;  // Post code not found
+        return null; // Not found
     }
 }

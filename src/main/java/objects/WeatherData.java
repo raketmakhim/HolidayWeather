@@ -1,66 +1,70 @@
 package objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import java.util.List;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherData {
-    private DailyData daily;
+    String date;
+    String maxTemp;
+    String minTemp;
+    String rain;
+    String sunshine;
 
-    public DailyData getDaily() {
-        return daily;
+    public WeatherData(String date, String maxTemp, String minTemp, String rain , String sunshine){
+        this.date = date;
+        this.maxTemp = maxTemp;
+        this.minTemp = minTemp;
+        this.rain = rain;
+        this.sunshine = sunshine;
     }
 
-    public void setDaily(DailyData daily) {
-        this.daily = daily;
+    public WeatherData(){}
+
+    public String getDate() {
+        return date;
     }
 
-    public static class DailyData {
-        private List<String> time;
-        private List<Double> temperature_2m_max;
-        private List<Double> temperature_2m_min;
-        private List<Double> rain_sum;
-        private List<Double> sunshine_duration;
+    public void setDate(String date) {
+        this.date = date;
+    }
 
-        public List<String> getTime() {
-            return time;
-        }
+    public String getMaxTemp() {
+        return maxTemp;
+    }
 
-        public void setTime(List<String> time) {
-            this.time = time;
-        }
+    public void setMaxTemp(String maxTemp) {
+        this.maxTemp = maxTemp;
+    }
 
-        public List<Double> getTemperature_2m_max() {
-            return temperature_2m_max;
-        }
+    public String getMinTemp() {
+        return minTemp;
+    }
 
-        public void setTemperature_2m_max(List<Double> temperature_2m_max) {
-            this.temperature_2m_max = temperature_2m_max;
-        }
+    public void setMinTemp(String minTemp) {
+        this.minTemp = minTemp;
+    }
 
-        public List<Double> getTemperature_2m_min() {
-            return temperature_2m_min;
-        }
+    public String getRain() {
+        return rain;
+    }
 
-        public void setTemperature_2m_min(List<Double> temperature_2m_min) {
-            this.temperature_2m_min = temperature_2m_min;
-        }
+    public void setRain(String rain) {
+        this.rain = rain;
+    }
 
-        public List<Double> getRain_sum() {
-            return rain_sum;
-        }
+    public String getSunshine() {
+        return sunshine;
+    }
 
-        public void setRain_sum(List<Double> rain_sum) {
-            this.rain_sum = rain_sum;
-        }
+    public void setSunshine(String sunshine) {
+        this.sunshine = sunshine;
+    }
 
-        public List<Double> getSunshine_duration() {
-            return sunshine_duration;
-        }
-
-        public void setSunshine_duration(List<Double> sunshine_duration) {
-            this.sunshine_duration = sunshine_duration;
-        }
+    @Override
+    public String toString() {
+        return "SingleDayWeatherData{" +
+                "date='" + date + '\'' +
+                ", maxTemp='" + maxTemp + '\'' +
+                ", minTemp='" + minTemp + '\'' +
+                ", rain='" + rain + '\'' +
+                ", sunshine='" + sunshine + '\'' +
+                '}';
     }
 }

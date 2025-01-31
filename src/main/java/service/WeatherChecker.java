@@ -1,7 +1,7 @@
 package service;
 
-import objects.SingleDayWeatherData;
 import objects.WeatherData;
+import objects.WeatherDataLists;
 import utils.factory.LocationFinderFactory;
 import utils.postcode.LocationFinder;
 import utils.web.WeatherApiClient;
@@ -20,29 +20,29 @@ public class WeatherChecker {
         this.locationFinderFactory = locationFinderFactory;
     }
 
-    public SingleDayWeatherData getWeatherForDate(String date, String postcode) throws IOException, InterruptedException {
+    public WeatherData getWeatherForDate(String date, String postcode) throws IOException, InterruptedException {
         LocationFinder locationFinder = locationFinderFactory.create(postcode);
-        WeatherData weatherData = apiClient.getWeather(locationFinder.getLongitude(), locationFinder.getLatitude());
-        return getSingleDayWeatherData(weatherData, date);
+        WeatherDataLists weatherDataLists = apiClient.getWeather(locationFinder.getLongitude(), locationFinder.getLatitude());
+        return getSingleDayWeatherData(weatherDataLists, date);
     }
 
-    private SingleDayWeatherData getSingleDayWeatherData(WeatherData weatherData, String date){
-        List<String> dates = weatherData.getDaily().getTime();
+    private WeatherData getSingleDayWeatherData(WeatherDataLists weatherDataLists, String date){
+        List<String> dates = weatherDataLists.getDaily().getTime();
 
-        SingleDayWeatherData data = new SingleDayWeatherData();
+        WeatherData data = new WeatherData();
 
         for (int i = 0; i < dates.size(); i++) {
             if (date.equals(dates.get(i))){
-                return new SingleDayWeatherData(
+                return new WeatherData(
                         date,
-                        weatherData.getDaily().getTemperature_2m_max().get(i).toString(),
-                        weatherData.getDaily().getTemperature_2m_min().get(i).toString(),
-                        weatherData.getDaily().getRain_sum().get(i).toString(),
-                        weatherData.getDaily().getSunshine_duration().get(i).toString()
+                        weatherDataLists.getDaily().getTemperature_2m_max().get(i).toString(),
+                        weatherDataLists.getDaily().getTemperature_2m_min().get(i).toString(),
+                        weatherDataLists.getDaily().getRain_sum().get(i).toString(),
+                        weatherDataLists.getDaily().getSunshine_duration().get(i).toString()
                 );
             }
         }
 
-        return new SingleDayWeatherData("0", "0", "0", "0", "0");
+        return new WeatherData("0", "0", "0", "0", "0");
     }
 }
