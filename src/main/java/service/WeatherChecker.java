@@ -1,66 +1,48 @@
 package service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import objects.SingleDayWeatherData;
 import objects.WeatherData;
-import utils.ConfigReader;
-import utils.CsvSearch;
-import utils.RequestClient;
-import utils.UriBuilder;
+import objects.WeatherDataLists;
+import utils.factory.LocationFinderFactory;
+import utils.postcode.LocationFinder;
+import utils.web.WeatherApiClient;
 
 import java.io.IOException;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 public class WeatherChecker {
 
-    ObjectMapper mapper = new ObjectMapper();
-    RequestClient client = new RequestClient();
-
-    private final String POSTCODE_DATA_FILE_URI;
-    private final String URL_NAME;
+    private final WeatherApiClient apiClient;
+    private final LocationFinderFactory locationFinderFactory;
 
     // Constructor to inject dependencies, useful for testing.
-    public WeatherChecker(String uri, String UrlName) {
-        this.POSTCODE_DATA_FILE_URI = uri;
-        this.URL_NAME = UrlName;
+    public WeatherChecker(LocationFinderFactory locationFinderFactory) throws IOException {
+        this.apiClient = new WeatherApiClient();
+        this.locationFinderFactory = locationFinderFactory;
     }
 
-    public SingleDayWeatherData getWeatherForDate(String date, String postcode) throws IOException, InterruptedException {
-        List<String[]> records = CsvSearch.readCsv(POSTCODE_DATA_FILE_URI);
-        String[] record = CsvSearch.binarySearch(records, postcode);
-
-        String longitude = record[2];
-        String latitude = record[3];
-
-        WeatherData weatherData = getWeatherData(longitude, latitude);
-        return getSingleDayWeatherData(weatherData, date);
+    public WeatherData getWeatherForDate(String date, String postcode) throws IOException, InterruptedException {
+        LocationFinder locationFinder = locationFinderFactory.create(postcode);
+        WeatherDataLists weatherDataLists = apiClient.getWeather(locationFinder.getLongitude(), locationFinder.getLatitude());
+        return getSingleDayWeatherData(weatherDataLists, date);
     }
 
-    private WeatherData getWeatherData(String longitude, String latitude) throws IOException, InterruptedException {
-        String baseUrl = ConfigReader.getProperties(URL_NAME);
-        String uri = UriBuilder.buildUri(baseUrl, longitude, latitude);
-        HttpResponse<String> response = client.sendGetRequest(uri);
-        return mapper.readValue(response.body(), WeatherData.class);
-    }
+    private WeatherData getSingleDayWeatherData(WeatherDataLists weatherDataLists, String date){
+        List<String> dates = weatherDataLists.getDaily().getTime();
 
-    private SingleDayWeatherData getSingleDayWeatherData(WeatherData weatherData, String date){
-        List<String> dates = weatherData.getDaily().getTime();
-
-        SingleDayWeatherData data = new SingleDayWeatherData();
+        WeatherData data = new WeatherData();
 
         for (int i = 0; i < dates.size(); i++) {
             if (date.equals(dates.get(i))){
-                return new SingleDayWeatherData(
+                return new WeatherData(
                         date,
-                        weatherData.getDaily().getTemperature_2m_max().get(i).toString(),
-                        weatherData.getDaily().getTemperature_2m_min().get(i).toString(),
-                        weatherData.getDaily().getRain_sum().get(i).toString(),
-                        weatherData.getDaily().getSunshine_duration().get(i).toString()
+                        weatherDataLists.getDaily().getTemperature_2m_max().get(i).toString(),
+                        weatherDataLists.getDaily().getTemperature_2m_min().get(i).toString(),
+                        weatherDataLists.getDaily().getRain_sum().get(i).toString(),
+                        weatherDataLists.getDaily().getSunshine_duration().get(i).toString()
                 );
             }
         }
 
-        return new SingleDayWeatherData("0", "0", "0", "0", "0");
+        return new WeatherData("0", "0", "0", "0", "0");
     }
 }
