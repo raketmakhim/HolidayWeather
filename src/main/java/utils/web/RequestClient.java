@@ -1,4 +1,4 @@
-package utils;
+package utils.web;
 
 import java.io.IOException;
 import java.net.URI;
