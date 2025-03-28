@@ -1,3 +1,4 @@
+import objects.Holiday;
 import objects.WeatherData;
 import service.WeatherChecker;
 import utils.algorithm.BinarySearch;
@@ -12,9 +13,8 @@ public class Main {
         Comparator<String> postcodeComparator = new PostcodeComparator();
         BinarySearch binarySearch = new BinarySearch(postcodeComparator);
         WeatherChecker service = new WeatherChecker(new LocationFinderFactory(binarySearch));
-
-        //date format needs to be YYYY-MM-DD
-        WeatherData data = service.getWeatherForDate("2025-02-01", "DN2 6NJ");
+        Holiday holiday = new Holiday("2025-02-01", "DN2 6NJ", service);
+        WeatherData data = holiday.getWeatherData();
         System.out.println(data.toString());
     }
 
